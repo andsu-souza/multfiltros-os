@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 
 class ClienteController extends Controller
@@ -11,7 +12,8 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        //
+        $clientes = Cliente::latest()->paginate(10);
+        return view('clientes.index', compact('clientes'));
     }
 
     /**
@@ -19,7 +21,7 @@ class ClienteController extends Controller
      */
     public function create()
     {
-        //
+        return view('clientes.create');
     }
 
     /**
@@ -27,7 +29,15 @@ class ClienteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $dadosGarantidos = $request->validate([
+            'nome' => 'required|string|max:255',
+            'telefone' => 'nullable|string|max:20',
+            'endereco' => 'nullable|string|max:255',
+        ]);
+
+        Cliente::create($dadosGarantidos);
+
+        return redirect()->route('clientes.index');
     }
 
     /**
@@ -43,7 +53,8 @@ class ClienteController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $cliente = Cliente::findOrFail($id);
+        return view('clientes.edit', compact('cliente'));
     }
 
     /**
@@ -51,7 +62,14 @@ class ClienteController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $dados = $request->validate([
+            'nome' => 'required|string|max:255',
+            'telefone' => 'nullable|string|max:20',
+            'endereco' => 'nullable|string|max:255',
+        ]);
+        $cliente = Cliente::findOrFail($id);
+        $cliente->update($dados);
+        return redirect()->route('clientes.index');
     }
 
     /**
@@ -59,6 +77,8 @@ class ClienteController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $cliente = Cliente::findOrFail($id);
+        $cliente->delete();
+        return redirect()->route('clientes.index');
     }
 }

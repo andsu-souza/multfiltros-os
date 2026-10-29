@@ -8,6 +8,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\TecnicoController;
 use App\Http\Controllers\AgendamentoController;
 use App\Http\Controllers\OrdemServicoController;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,12 +23,15 @@ use App\Http\Controllers\OrdemServicoController;
 
 // Página inicial pública (opcional, pode redirecionar para o login)
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login');
 });
 
 // Grupo de rotas protegidas por autenticação (exige que o utilizador esteja com login feito)
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
     // Menu Principal / Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -41,8 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Rota personalizada para gerar e exportar a Ordem de Serviço em PDF
     Route::get('ordens-servico/{id}/pdf', [OrdemServicoController::class, 'gerarPdf'])->name('ordens-servico.pdf');
-
 });
 
 // Rotas de autenticação geradas pelo Laravel Breeze (login, registo, recuperação de senha)
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
